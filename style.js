@@ -1,0 +1,35 @@
+function accessiFrameContent() {
+  let iframe = document.getElementById("frame");
+  let innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+  let canvas = innerDoc.getElementById("canvas");
+  iframe.width = canvas.scrollWidth;
+  iframe.height = canvas.scrollHeight;
+}
+
+function openFirstTab(sectionName) {
+  let tabcontent;
+  let tablinks;
+
+  tabcontent = document.getElementsByClassName("tabcontent " + sectionName);
+  tabcontent[0].style.display = "block";
+
+  tablinks = document.getElementsByClassName("tablinks " + sectionName);
+  tablinks[0].className += " active";
+  console.log("test");
+}
+function openTab(event, tabName, sectionName) {
+  let tabcontent;
+  let tablinks;
+
+  tabcontent = document.getElementsByClassName("tabcontent " + sectionName);
+  for (let i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  tablinks = document.getElementsByClassName("tablinks " + sectionName);
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  event.currentTarget.className += " active";
+}
