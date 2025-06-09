@@ -10,10 +10,8 @@
     sans-serif;
 }
 @font-face {
-  font-family: "JetbrainMono";
-  src: url("Font/jetbrainsmononerdfont-regular.ttf");
-  font-weight: normal;
-  font-style: normal;
+  font-family: "JetbrainsMono";
+  src: url("/Fonts/JetBrainsMonoNerdFont-Regular.ttf");
 }
 header {
   z-index: 1;
