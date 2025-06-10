@@ -1,0 +1,61 @@
+<BS>name: Deploy to GitHub Pages
+
+on:
+  # Trigger the workflow every time you push to the `main` branch
+  # Using a different branch name? Replace `main` with your branch's name
+  push:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab on GitHub.
+  workflow_dispatch:
+
+# Allow this job to clone the repo and create a page deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository using git
+        uses: actions/checkout@v4
+      - name: Check for broken links
+        run: |
+          # Build the site for link checking
+          npm run build
+          
+          # Install link checker
+          npm install --no-save broken-link-checker
+          
+          # Run link checker against the built site
+          echo "Running link check against the built site..."
+          npx blc http://localhost:8080 -ro --exclude linkedin.com --exclude twitter.com --filter-level 3 &
+          
+          # Serve the built site
+          cd dist && npx http-server -p 8080 &
+          SERVER_PID=$!
+          
+          # Wait for server to start
+          sleep 5
+          
+          # Run the link checker
+          LINK_CHECK_EXIT_CODE=0
+          npx blc http://localhost:8080 -ro --exclude linkedin.com --exclude twitter.com --filter-level 1 --timeout 5000 || LINK_CHECK_EXIT_CODE=$?
+          
+          # Kill the server
+          kill $SERVER_PID
+          
+          # Exit with the link checker exit code
+          exit $LINK_CHECK_EXIT_CODE
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
