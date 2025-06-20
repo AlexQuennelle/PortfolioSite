@@ -72,7 +72,7 @@ jobs:
           exit $LINK_CHECK_EXIT_CODE
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
 
   deploy:
     needs: build
