@@ -20,33 +20,49 @@ jobs:
     steps:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or your preferred Node.js version
+
+      - name: Install dependencies and build site
+        run: |
+          npm install
+          npm run build # Ensure your build command is correct for your project
+        # Only run if you have a build step that outputs to a 'dist' directory
+        # If your site doesn't require a build (e.g., pure static HTML), you can skip this.
+
       - name: Check for broken links
         run: |
-          # Build the site for link checking
-          npm run build
-          
-          # Install link checker
-          npm install --no-save broken-link-checker
-          
-          # Run link checker against the built site
-          echo "Running link check against the built site..."
-          npx blc http://localhost:8080 -ro --exclude linkedin.com --exclude twitter.com --filter-level 3 &
-          
-          # Serve the built site
-          cd dist && npx http-server -p 8080 &
+          # Install broken-link-checker and http-server globally for easier access
+          npm install -g broken-link-checker http-server
+
+          # Serve the built site in the background
+          # Adjust 'dist' if your build output is in a different directory
+          # If no build step, you might just serve the root of your repository (e.g., 'http-server .')
+          http-server dist -p 8080 &
           SERVER_PID=$!
-          
-          # Wait for server to start
-          sleep 5
-          
+
+          echo "Waiting for server to start..."
+          sleep 5 # Give the server some time to start up
+
+          echo "Running link check against the built site..."
           # Run the link checker
+          # --recursive: Check all links on the served site
+          # --ordered: Display links in the order they are found
+          # --exclude: Exclude specific domains
+          # --filter-level 1: Report only broken links (4xx, 5xx status codes)
+          # --timeout: Increase timeout for potentially slow links
           LINK_CHECK_EXIT_CODE=0
-          npx blc http://localhost:8080 -ro --exclude linkedin.com --exclude twitter.com --filter-level 1 --timeout 5000 || LINK_CHECK_EXIT_CODE=$?
-          
+          blc http://localhost:8080 --recursive --ordered --exclude linkedin.com --exclude twitter.com --filter-level 1 --timeout 10000 || LINK_CHECK_EXIT_CODE=$?
+
           # Kill the server
+          echo "Killing the server..."
           kill $SERVER_PID
-          
+
           # Exit with the link checker exit code
+          # This ensures the workflow fails if broken links are found
           exit $LINK_CHECK_EXIT_CODE
 
   deploy:
