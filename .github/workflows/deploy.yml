@@ -50,7 +50,7 @@ jobs:
           # --filter-level 1: Report only broken links (4xx, 5xx status codes)
           # --timeout: Increase timeout for potentially slow links
           LINK_CHECK_EXIT_CODE=0
-          blc http://localhost:8080 --recursive --ordered --exclude linkedin.com --exclude twitter.com --exclude itch.io --filter-level 1 --timeout 10000 || LINK_CHECK_EXIT_CODE=$?
+          blc http://127.0.0.1:8080 --recursive --ordered --exclude linkedin.com --exclude twitter.com --exclude itch.io --filter-level 1 --timeout 10000 || LINK_CHECK_EXIT_CODE=$?
 
           # Kill the server
           echo "Killing the server..."
