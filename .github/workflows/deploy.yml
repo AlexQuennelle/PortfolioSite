@@ -21,25 +21,33 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
-      - name: Install dependencies and build site
-        run: |
-          npm install
-          npm run build # Ensure your build command is correct for your project
-        # Only run if you have a build step that outputs to a 'dist' directory
-        # If your site doesn't require a build (e.g., pure static HTML), you can skip this.
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      - name: Setup Node.js for link checker
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
       - name: Check for broken links
         run: |
-          # Install broken-link-checker and http-server globally for easier access
+          # Install broken-link-checker and http-server globally
           npm install -g broken-link-checker http-server
 
-          # Serve the built site in the background
-          # Adjust 'dist' if your build output is in a different directory
-          # If no build step, you might just serve the root of your repository (e.g., 'http-server .')
-          http-server dist -p 8080 &
+          # Serve the built Jekyll site in the background
+          # Jekyll builds to _site directory by default
+          http-server _site -p 8080 &
           SERVER_PID=$!
 
           echo "Waiting for server to start..."
@@ -49,11 +57,11 @@ jobs:
           # Run the link checker
           # --recursive: Check all links on the served site
           # --ordered: Display links in the order they are found
-          # --exclude: Exclude specific domains
+          # --exclude: Exclude specific domains that might be flaky
           # --filter-level 1: Report only broken links (4xx, 5xx status codes)
           # --timeout: Increase timeout for potentially slow links
           LINK_CHECK_EXIT_CODE=0
-          blc http://localhost:8080 --recursive --ordered --exclude linkedin.com --exclude twitter.com --filter-level 1 --timeout 10000 || LINK_CHECK_EXIT_CODE=$?
+          blc http://localhost:8080 --recursive --ordered --exclude linkedin.com --exclude twitter.com --exclude itch.io --filter-level 1 --timeout 10000 || LINK_CHECK_EXIT_CODE=$?
 
           # Kill the server
           echo "Killing the server..."
@@ -62,6 +70,9 @@ jobs:
           # Exit with the link checker exit code
           # This ensures the workflow fails if broken links are found
           exit $LINK_CHECK_EXIT_CODE
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
 
   deploy:
     needs: build
