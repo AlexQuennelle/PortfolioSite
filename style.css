@@ -4,10 +4,22 @@
   --bg2: #303032;
   --hl0: #555;
   --text: #f1f1f1;
+  --link: #78a9ff;
+  --link-visited: #be95ff;
   --sans-font:
     -apple-system, BlinkMacSystemFont, "Avenir Next", Avenir, "Nimbus Sans L",
     Roboto, "Noto Sans", "Segoe UI", Arial, Helvetica, "Helvetica Neue",
     sans-serif;
+}
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+a:visited {
+  color: var(--link-visited);
 }
 @font-face {
   font-family: "JetbrainsMono";
@@ -37,6 +49,10 @@ nav > a {
 nav > a:hover {
   background-color: #404043;
   border: 1px solid #fff;
+  text-decoration: none;
+}
+nav > a:visited {
+  color: var(--text);
 }
 body {
   font-family: var(--sans-font);
