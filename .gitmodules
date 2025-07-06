@@ -1,0 +1,3 @@
+[submodule "Projects/Asteroids/AsteroidsProject"]
+	path = Projects/Asteroids/AsteroidsProject
+	url = git@github.com:AlexQuennelle/AsteroidsProject.git
