@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Voxel Loader</title>
+  <link rel="stylesheet" href="../../style.css" />
+
+  <!-- highlight.js -->
+  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
+    media="(prefers-color-scheme: light)" />
+  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css"
+    media="(prefers-color-scheme: dark)" />
+  <style>
+    pre.code-wrapper {
+      padding: 0;
+    }
+  </style>
+  <script src="https://unpkg.com/@highlightjs/cdn-assets@11/highlight.min.js"></script>
+  <!-- Initialize highlight.js -->
+</head>
+<header>
+  <nav>
+    <a href="../../index.html">Home</a>
+    <!-- Link back to the main index -->
+  </nav>
+  <h1>Asteroids</h1>
+  <script src="../../style.js"></script>
+</header>
+<main>
+  <section>
+    <figure>
+      <iframe src="AsteroidsProject/index.html" loading="lazy" scrolling="no" style="border: none" id="frame"
+        onload="accessiFrameContent()"></iframe>
+      <script></script>
+      <figcaption>WAD to move, Spacebar to shoot, S to teleport</figcaption>
+    </figure>
+  </section>
+  <section id="desc">
+    <h2>Description</h2>
+    <p>
+      This is an implementation of the game Asteroids using the
+      <a href="p5js.org">p5js</a> library. The project was an assignment for
+      our Applied Math for Games class in college, and had many learning
+      goals. The assignment was a sort of "choose your own adventure", where
+      we were given a list of features with an associated point value, and a
+      total point threshold that would be considered 100%.
+    </p>
+    <p>
+      The most interesting parts of the project for me, where the
+      architecture, the polygon collision detection, and the collision
+      avoidence system for small saucers.
+    </p>
+    <h3>Collision</h3>
+    <p>
+      The colliders use an implementation of the
+      <a href="https://programmerart.weebly.com/separating-axis-theorem.html">
+        Separating Axis Theorem
+      </a>
+      where concave shapes are achieved using multiple convex colliders. I
+      also implemented a specialized circle collider for simple shapes, as
+      where applicable, it saves on some dot-product operations and finding
+      the minimum and maximum distances along a given axis. It also provides
+      more accurate collision for round objects. Ensuring objects could rotate
+      and still collide correctly proved to be annoying, especially given each
+      object has a list of colliders that all need to be rotated. To solve
+      this, I had to pass in not only the other object being checked against,
+      but also the current objects position and rotation every time I called
+      the <code>CheckCollision()</code> method.
+    </p>
+    <h3>Navigation</h3>
+    <p>
+      The saucer navigation was a bonus challenge on the assignment worth 10
+      points where all others were worth 3 or less. The task was to make small
+      saucers intelligently avoid asteroid, bullets, and the player while
+      making their way accross the screen. The way I solved this problem was
+      by adding a secondary circle collider to act as a detection range, and
+      using the directions from the saucer to all other objects in that range
+      to influence its current travel direction. The influence each object has
+      is inversly propertional to the distance from the object to the saucer,
+      meaning the closer the object is, the more urgently the saucer attempts
+      to flee from it.
+    </p>
+  </section>
+  <section class="stretch">
+    <h2>Source Code</h2>
+    <p>
+      The following is some of the more insteresting code. Full source code
+      can be found
+      <a href="https://github.com/AlexQuennelle/AsteroidsProject">here</a>.
+    </p>
+    <div class="tab">
+      <button class="tablinks file" onclick="openTab(event, 'coreLogic', 'file')">
+        Core Logic
+      </button>
+      <button class="tablinks file" onclick="openTab(event, 'player', 'file')">
+        Player
+      </button>
+      <button class="tablinks file" onclick="openTab(event, 'colliders', 'file')">
+        Colliders
+      </button>
+      <button class="tablinks file" onclick="openTab(event, 'saucers', 'file')">
+        Saucers
+      </button>
+    </div>
+    <div class="tabcontent file" id="coreLogic">
+      <h3>Core Logic</h3>
+      <h4>sketch.js</h4>
+      <pre class="js"><code id="sketch.js"></code></pre>
+      <h4>game.js</h4>
+      <pre class="js"><code id="game.js"></code></pre>
+    </div>
+    <div class="tabcontent file" id="player">
+      <h3>playerShip.js</h3>
+      <pre class="js"><code id="playerShip.js"></code></pre>
+    </div>
+    <div class="tabcontent file" id="colliders">
+      <h3>Colliders</h3>
+      <h4>collider.js</h4>
+      <pre class="js"><code id="collider.js"></code></pre>
+      <h4>circleCollider.js</h4>
+      <pre class="js"><code id="circleCollider.js"></code></pre>
+    </div>
+    <div class="tabcontent file" id="saucers">
+      <h3>Saucers</h3>
+      <h4>saucer.js</h4>
+      <pre class="js"><code id="saucer.js"></code></pre>
+      <h4>smallSaucer.js</h4>
+      <pre class="js"><code id="smallSaucer.js"></code></pre>
+    </div>
+    <script>
+      openFirstTab("file");
+      fetchCode("AsteroidsProject/", "sketch.js");
+      fetchCode("AsteroidsProject/", "game.js");
+      fetchCode("AsteroidsProject/", "playerShip.js");
+      fetchCode("AsteroidsProject/", "collider.js");
+      fetchCode("AsteroidsProject/", "circleCollider.js");
+      fetchCode("AsteroidsProject/", "saucer.js");
+      fetchCode("AsteroidsProject/", "smallSaucer.js");
+    </script>
+  </section>
+</main>
+
+</html>
