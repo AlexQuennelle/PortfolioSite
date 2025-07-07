@@ -42,7 +42,9 @@ function fetchCode(fileLocation, fileName) {
     .then((data) => {
       const codeBlock = document.getElementById(fileName);
       codeBlock.textContent = data;
-      codeBlock.classList.add(codeBlock.parentElement.classList[0]);
+      if (codeBlock.classList.length > 0) {
+        codeBlock.classList.add(codeBlock.parentElement.classList[0]);
+      }
       hljs.highlightElement(codeBlock);
     });
 }
