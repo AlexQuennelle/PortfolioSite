@@ -25,6 +25,10 @@ a:visited {
   font-family: "JetbrainsMono";
   src: url("Fonts/JetBrainsMonoNerdFont-Regular.ttf");
 }
+p > code {
+  color: #a0a0a0;
+  font-family: "JetbrainsMono";
+}
 header {
   z-index: 1;
   position: sticky;
@@ -173,6 +177,7 @@ button.tablinks {
   height: 3em;
   border: 2px solid var(--hl0);
   border-radius: 0.8em 0.8em 0% 0%;
+  margin: 0 0.05em;
 }
 button.active {
   border-bottom: 2px solid transparent;

@@ -33,8 +33,8 @@
 <main>
   <section>
     <figure>
-      <iframe src="VoxelLoader_1.0_web/VoxelLoader.html" loading="lazy" scrolling="no" style="border: none" id="frame"
-        onload="accessiFrameContent()"></iframe>
+      <iframe src="VoxelLoader_2.0_web/VoxelLoader.html" loading="lazy" scrolling="no"
+        style="border: none; width: 500px; height: 500px" id="frame" onload="accessiFrameContent()"></iframe>
       <script></script>
       <figcaption>
         Click and drag to rotate, refresh page for a different model
@@ -68,20 +68,77 @@
       implementing this, as it felt very satisfying to successfully read and
       interpret raw byte data.
     </p>
+    <p>
+      In the initial version of the project, I used a naive approach to
+      rendering the models, because I needed it to be done in a relatively
+      short timeframe. Once I had the voxel data parsed from the binary file,
+      I simply looped through the array containing coordinates where a voxel
+      existed, and drew a cube with raylib. Doing this every frame was
+      obviously not ideal, and the performance implications were very apparent
+      when trying to render large models like the voxelized version of the
+      stanford dragon provided by the
+      <a href="https://github.com/ephtracy/voxel-model">
+        .vox file format github
+      </a>
+      (this model is included as an example in this build). Not only is
+      drawing a cube for every voxel causing a lot of overdraw, the bigger
+      issue is the large number of draw calls happening. To get around this,
+      the obvious solution is to generate a proper mesh from the provided
+      voxel data. Not only does this allow me to cull the faces in between
+      voxels, but crucially it allows the entire model to be drawn in very few
+      calls to the GPU—ideally even just a single one. At first I tried
+      turning the models into a single mesh regardless of size, and managed to
+      get it working pretty quickly. Unfortunately when I tried to load the
+      aforementioned dragon model, it only rendered a small portion of the
+      tail. I spent quite a while trying to figure out what was happenning,
+      before ultimately discovering the culprit was integer overflow.
+      Raylib(and I'm led to believe OpenGL) uses a <code>uint16</code> array
+      for triangle indices. This means that if a mesh has more than 65535
+      vertices, only a portion will be able to be accessed and converted to
+      triangles. I knew from a brief venture into bare OpenGl that it was
+      possible to draw mesh without using the index array, and to my mild
+      surprise all it took to get the model to draw correctly was adding some
+      duplicate vertices to the mesh and removing the code to add indices.
+    </p>
+    <p>
+      Sadly for me, that was not actually the end of the story. When I tried
+      doing a WASM build of the project, nothing rendered. It wasn't just the
+      large stanford dragon, but even the smaller models that hadn't had any
+      issues bfore were now gone, leaving an empty square of cornflower blue
+      and a very unhelpful webGL error message. As it turns out, webGL and a
+      few other implementations <strong>require</strong> index arrays to draw
+      anything. This means I have to take a few steps back and add another
+      step of processing to the models before they can be rendered.
+      Fortunately that step is pretty simple. Instead of storing a single
+      raylib mesh struct, we can store a vector of meshes and create a new
+      mesh as soon as the current one gets too close to the limit imposed by
+      <code>uint16</code>. To absolutely nobody's surprise, I ran into yet
+      another issue trying to implement this. As it turns out, initializing a
+      local mesh struct with <code>Mesh mesh{};</code> does not create a
+      unique object every time, and in fact causes some weird situations where
+      even code behind an <code>if</code> statement that isn't ever reached,
+      can cause the mesh to think it's been uploaded to the GPU more than it
+      actually has. The way I fixed this was to instead initialize the struct
+      with <code>auto* mesh = new Mesh();</code>, and then push it to the
+      vector with <code>meshes.push_back(*mesh)</code>. With this final
+      problem solved, I was able to successfully split up large meshes and
+      draw them with very acceptable performance, even in web builds.
+    </p>
   </section>
   <section class="stretch">
     <h2>Source Code</h2>
+    <p>
+      The following is most of the relevant code. Full source code can be
+      found
+      <a href="https://github.com/AlexQuennelle/VoxelLoader">here</a>.
+    </p>
     <div class="tab">
-      <button class="tablinks lang" onclick="openTab(event, 'cmakelists', 'lang')">
-        CmakeLists.txt
-      </button>
       <button class="tablinks lang" onclick="openTab(event, 'C++', 'lang')">
         C++
       </button>
-    </div>
-    <div class="tabcontent lang" id="cmakelists">
-      <h3>cmakelists</h3>
-      <pre><code id="cmakelists.txt"></code></pre>
+      <button class="tablinks lang" onclick="openTab(event, 'cmakelists', 'lang')">
+        CmakeLists.txt
+      </button>
     </div>
     <div class="tabcontent lang" id="C++">
       <h3>C++</h3>
@@ -92,8 +149,8 @@
         <button class="tablinks file" onclick="openTab(event, 'model', 'file')">
           model.cpp
         </button>
-        <button class="tablinks file" onclick="openTab(event, 'volume', 'file')">
-          volume.cpp
+        <button class="tablinks file" onclick="openTab(event, 'mesh', 'file')">
+          meshGeneration.cpp
         </button>
       </div>
       <div class="tabcontent file" id="main">
@@ -102,9 +159,13 @@
       <div class="tabcontent file" id="model">
         <pre><code id="model.txt"></code></pre>
       </div>
-      <div class="tabcontent file" id="volume">
-        <pre><code id="volume.txt"></code></pre>
+      <div class="tabcontent file" id="mesh">
+        <pre><code id="meshGeneration.txt"></code></pre>
       </div>
+    </div>
+    <div class="tabcontent lang" id="cmakelists">
+      <h3>cmakelists</h3>
+      <pre><code id="cmakelists.txt"></code></pre>
     </div>
     <script>
       openFirstTab("lang");
@@ -112,7 +173,7 @@
       fetchCode("", "cmakelists.txt");
       fetchCode("", "main.txt");
       fetchCode("", "model.txt");
-      fetchCode("", "volume.txt");
+      fetchCode("", "meshGeneration.txt");
     </script>
   </section>
 </main>

@@ -1,7 +1,10 @@
-#include "model.h"
+#include "vxlModel.h"
+#include "meshGeneration.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -9,16 +12,10 @@
 #include <ios>
 #include <iosfwd>
 #include <iostream>
+#include <raylib.h>
+#include <raymath.h>
 #include <string>
 #include <vector>
-#if defined(APLATFORM_DESKTOP)
-namespace win
-{
-#include <windows.h>
-#include <winnt.h>
-#include <winscard.h>
-} //namespace win
-#endif // _WIN32
 
 namespace vxl
 {
@@ -93,32 +90,28 @@ std::ostream& operator<<(std::ostream& os, Vector4Int vec)
     return os;
 }
 
-Model::Model(const std::string& filePath)
+vxlModel::vxlModel(const std::string& filePath)
 {
-#if defined(APLATFORM_DESKTOP)
-    using win::HANDLE;
-    HANDLE hConsole = win::GetStdHandle(((win::DWORD)-11));
+#if defined(PLATFORM_WEB)
+    this->shader = LoadShader(RESOURCES_PATH "shaders/litShader_web.vert",
+                              RESOURCES_PATH "shaders/litShader_web.frag");
+#else
+    this->shader = LoadShader(RESOURCES_PATH "shaders/litShader.vert",
+                              RESOURCES_PATH "shaders/litShader.frag");
 #endif
+    this->mat = LoadMaterialDefault();
+    this->mat.shader = this->shader;
 
     std::streampos fSize;
     char* fileData;
 
-    //attempt to open file
     std::ifstream file(filePath.c_str(), ios::in | ios::binary | ios::ate);
-#if defined(APLATFORM_DESKTOP)
-    win::SetConsoleTextAttribute(hConsole, FOREGROUND_YELLOW);
-#endif
+    SetTextColor(INFO);
     std::cout << '\n' << "Loading ";
-#if defined(APLATFORM_DESKTOP)
-    win::SetConsoleTextAttribute(hConsole, FOREGROUND_GREY);
-#endif
+    SetTextColor({0, 240, 255, 0});
     std::cout << "\"" << filePath << "\"" << '\n';
     if (file.is_open())
     {
-#if defined(APLATFORM_DESKTOP)
-        win::SetConsoleTextAttribute(hConsole, FOREGROUND_YELLOW);
-#endif
-
         this->palette = default_palette;
 
         //load file into memory
@@ -132,22 +125,18 @@ Model::Model(const std::string& filePath)
         std::copy(fileData, fileData + 4, this->ID.begin());
         std::memcpy(&this->version, &fileData[4], 4);
 
+        SetTextColor(SUCCESS);
         std::cout << this->ID << "file found:" << '\n';
+        SetTextColor(INFO);
         std::cout << "Version: ";
-#if defined(APLATFORM_DESKTOP)
-        win::SetConsoleTextAttribute(hConsole, FOREGROUND_WHITE);
-#endif
+        ClearStyles();
         std::cout << this->version << '\n';
 
-#if defined(APLATFORM_DESKTOP)
-        win::SetConsoleTextAttribute(hConsole, FOREGROUND_YELLOW);
-#endif
+        SetTextColor(INFO);
         //send data to be processed
         ProcessChunks(fileData + 8);
 
-#if defined(APLATFORM_DESKTOP)
-        win::SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
-#endif
+        SetTextColor(SUCCESS);
         std::cout << "Load Successful!" << '\n';
 
         //clear memory
@@ -155,18 +144,13 @@ Model::Model(const std::string& filePath)
     }
     else
     {
-#if defined(APLATFORM_DESKTOP)
-        win::SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
-#endif
+        SetTextColor(ERROR);
         std::cout << "Unable to open " << filePath << '\n';
     }
-#if defined(APLATFORM_DESKTOP)
-    win::SetConsoleTextAttribute(hConsole, FOREGROUND_WHITE);
-#endif
+    ClearStyles();
 }
-void Model::ProcessChunks(char* bytes)
+void vxlModel::ProcessChunks(char* bytes)
 {
-    //set up some utility variables
     //these are used to iterate through the data correctly
     uint32_t fileContent;
     uint32_t fileChildren;
@@ -174,6 +158,12 @@ void Model::ProcessChunks(char* bytes)
     std::memcpy(&fileChildren, bytes + 8, 4);
     char* endAddr = bytes + (fileContent + fileChildren + 12);
     char* addr{bytes + 12};
+    struct FrameData
+    {
+        char* addr;
+        char* nextAddr;
+    };
+    vector<FrameData> frameQueue;
     //custom iterator
     //step through the block of raw bytes according to the chunk information
     while (addr < endAddr)
@@ -194,7 +184,7 @@ void Model::ProcessChunks(char* bytes)
             this->frameCount = frameCount;
             break;
         case BOUNDINGBOX:
-            AddFrame(addr, nextAddr);
+            frameQueue.push_back({.addr = addr, .nextAddr = nextAddr});
             uint32_t nextContent;
             uint32_t nextChildren;
             std::memcpy(&nextContent, nextAddr + 4, 4);
@@ -210,27 +200,62 @@ void Model::ProcessChunks(char* bytes)
         }
         addr += (chunkContent + chunkChildren + 12);
     }
+    for (auto frame : frameQueue)
+    {
+        AddFrame(frame.addr, frame.nextAddr);
+    }
     std::cout << "Done processing chunks!" << '\n';
 }
-void Model::AddFrame(char* boundData, char* voxelData)
+void vxlModel::AddFrame(char* boundData, char* voxelData)
 {
     std::cout << "New frame" << '\n';
     Vector3Int bounds;
     std::memcpy(&bounds, boundData + 12, 12);
     uint32_t voxelCount;
     std::memcpy(&voxelCount, voxelData + 12, 4);
-    AnimationFrame frame{};
-    frame.bounds = bounds;
-    frame.voxels.reserve(voxelCount);
+
+    int32_t voxVolume{bounds.x * bounds.y * bounds.z};
+    vector<int16_t> volume(voxVolume);
+    volume.reserve(voxVolume);
+
+    //convert list of filled voxels to array of indices
+    //index of -1 means empty
+    std::ranges::fill(volume, -1);
     for (uint32_t i{0}; i < voxelCount; i++)
     {
-        frame.voxels.push_back(
-            {.x = static_cast<uint8_t>(*(voxelData + 16 + (i * 4))),
-             .y = static_cast<uint8_t>(*(voxelData + 18 + (i * 4))),
-             .z = static_cast<uint8_t>(*(voxelData + 17 + (i * 4))),
-             .i = static_cast<uint8_t>(*(voxelData + 19 + (i * 4)))});
+        auto x = static_cast<uint8_t>(*(voxelData + 16 + (i * 4)));
+        auto y = static_cast<uint8_t>(*(voxelData + 18 + (i * 4)));
+        auto z = static_cast<uint8_t>(*(voxelData + 17 + (i * 4)));
+        uint32_t index = (x * bounds.y * bounds.z) + (y * bounds.z) + z;
+        volume[index] = static_cast<uint8_t>(*(voxelData + 19 + (i * 4)));
     }
-    this->frames.push_back(std::move(frame));
+
+    vxlMesh mesh = GenerateVoxelMesh(volume, bounds, this->palette);
+    this->bounds = bounds;
+
+    this->meshes.push_back(mesh);
+    for (uint32_t i{0}; i < this->meshes[this->meshes.size() - 1].meshes.size();
+         i++)
+    {
+        UploadMesh(&this->meshes[this->meshes.size() - 1].meshes[i], false);
+    }
+}
+
+void vxlModel::Draw()
+{
+    for (auto mesh : this->meshes[this->curFrame].meshes)
+    {
+        DrawMesh(mesh, this->mat, MatrixIdentity());
+    }
+    if (this->renderedFrames < 5)
+    {
+        this->renderedFrames++;
+    }
+    else
+    {
+        renderedFrames = 0;
+        this->curFrame = (this->curFrame + 1) % this->frameCount;
+    }
 }
 
 template <std::size_t N>

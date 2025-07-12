@@ -1,8 +1,7 @@
 function accessiFrameContent() {
   let iframe = document.getElementById("frame");
   let innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-  let canvas =
-    innerDoc.getElementById("canvas") || innerDoc.querySelector("body");
+  let canvas = innerDoc.getElementById("canvas");
   iframe.width = canvas.scrollWidth;
   iframe.height = canvas.scrollHeight;
 }

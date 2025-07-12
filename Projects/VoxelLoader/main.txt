@@ -1,5 +1,5 @@
-#include "model.h"
-#include "volume.h"
+#include "utils.h"
+#include "vxlModel.h"
 
 #include <algorithm>
 #include <cmath>
@@ -18,11 +18,12 @@
 void Update();
 
 Camera cam;
-vxl::Model* model;
+vxl::vxlModel* vxlmodel;
 Vector2 camSpeed;
 
 int main()
 {
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
 #if defined(PLATFORM_WEB)
     std::string fileName;
     std::random_device rnd;
@@ -32,16 +33,22 @@ int main()
         std::vector<std::string> files;
         for (const auto& entry : fs::directory_iterator(RESOURCES_PATH))
         {
-            files.push_back(
-                entry.path().string().erase(0, strlen(RESOURCES_PATH)));
+            std::string name =
+                entry.path().string().erase(0, strlen(RESOURCES_PATH));
+            if (name.substr(name.length() - 4, 4) == ".vox")
+            {
+                files.push_back(name);
+                std::cout << name << '\n';
+            }
         }
         std::cout << files.size() << '\n';
         std::uniform_int_distribution<> random(0, files.size() - 1);
         fileName = files[random(gen)];
     }
 
-    InitWindow(400, 400, NAME);
+    InitWindow(500, 500, NAME);
 #else
+    std::string fileName;
     std::cout << "Chose a file to load\n\n";
     {
         namespace fs = std::filesystem;
@@ -49,44 +56,64 @@ int main()
         {
             std::string name =
                 entry.path().string().erase(0, strlen(RESOURCES_PATH));
-            std::cout << '\t' << name << '\n';
+            if (name.substr(name.length() - 4, 4) == ".vox")
+            {
+                std::cout << '\t' << name << '\n';
+            }
         }
     }
-    std::string fileName;
-    std::cout << '\n';
+    std::cout << "\n\n\0337";
     std::cout << "Enter file name: ";
-    std::cin >> fileName;
-
-    // TODO: make this fancier later
-    if (!std::filesystem::exists(RESOURCES_PATH + fileName))
+    bool chosingFile{true};
+    while (chosingFile)
     {
-        std::cout << RESOURCES_PATH << fileName << " does not exist\n";
-        return -1;
+        std::cin >> fileName;
+
+        if (!std::filesystem::exists(RESOURCES_PATH + fileName))
+        {
+            //Move back up one line to counteract RETURN and clear
+            //Then restore saved position and move up one
+            //This means the error message prints above the input and the
+            //input field clears itself correctly regardless of empty returns
+            std::cout << "\033[1A\033[2K\0338\033[1A\033[2K";
+            vxl::SetTextColor(vxl::ERROR);
+            std::cout << RESOURCES_PATH << fileName << " does not exist\0338";
+            std::cout << "Enter file name: ";
+            vxl::ClearStyles();
+        }
+        else if (fileName.substr(fileName.length() - 4, 4) != ".vox")
+        {
+            std::cout << "\033[1A\033[2K\0338\033[1A";
+            vxl::SetTextColor(vxl::ERROR);
+            std::cout << RESOURCES_PATH << fileName
+                      << " is not a .vox file\0338";
+            std::cout << "Enter file name: ";
+            vxl::ClearStyles();
+        }
+        else
+        {
+            chosingFile = false;
+            std::cout << "\033[2J\033[H";
+        }
     }
 
     InitWindow(800, 800, NAME);
 #endif
-    model = new vxl::Model(RESOURCES_PATH + fileName);
+    vxlmodel = new vxl::vxlModel(RESOURCES_PATH + fileName);
 
     float vFOV = 45.0f;
     float aspectRatio = static_cast<float>(GetScreenWidth()) /
                         static_cast<float>(GetScreenHeight());
-    std::cout << "Aspect Ratio: " << aspectRatio << '\n';
     float fov =
         std::min(vFOV, RAD2DEG * (2 * std::atan(std::tan((DEG2RAD * vFOV) / 2) *
                                                 aspectRatio)));
-    std::cout << "FOV: " << fov << '\n';
-    auto mBounds = Vector3(model->frames[0].bounds.x, model->frames[0].bounds.y,
-                           model->frames[0].bounds.z);
+    auto mBounds =
+        Vector3(vxlmodel->bounds.x, vxlmodel->bounds.y, vxlmodel->bounds.z);
     float rad =
         sqrt((pow(mBounds.x, 2) + pow(mBounds.y, 2)) + pow(mBounds.z, 2)) / 2;
-    std::cout << "Radius: " << rad << '\n';
     float dist = rad * (std::sin(DEG2RAD * 90) / std::sin(DEG2RAD * (fov / 2)));
-    std::cout << "Distance: " << dist << '\n';
     camSpeed = {.x = 0.36f - std::pow(dist * (1.0f / 25000.0f), 1.0f / 3.5f),
                 .y = 0.97f - std::pow(dist * 1.0f / 500.0f, 1.0f / 5.0f)};
-    std::cout << "Camera rotation speed: (" << camSpeed.x << ", " << camSpeed.y
-              << ")\n";
 
     {
         using namespace std::numbers;
@@ -112,7 +139,7 @@ int main()
     }
 #endif
 
-    delete model;
+    delete vxlmodel;
     CloseWindow();
 
     return 0;
@@ -151,7 +178,7 @@ void Update()
     ClearBackground({100, 149, 237, 255});
     BeginMode3D(cam);
 
-    vxl::DrawVolume(model);
+    vxlmodel->Draw();
 
     EndMode3D();
     DrawFPS(0, 0);
