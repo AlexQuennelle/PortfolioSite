@@ -56,3 +56,14 @@ function isMobile() {
     /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
   return regex.test(navigator.userAgent);
 }
+
+function mobileOverride(path) {
+  if (isMobile()) {
+    doc = document.head;
+    link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = path + "style-mobile.css";
+    doc.appendChild(link);
+  }
+}
