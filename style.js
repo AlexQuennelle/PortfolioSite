@@ -2,6 +2,9 @@ function accessiFrameContent() {
   let iframe = document.getElementById("frame");
   let innerDoc = iframe.contentDocument || iframe.contentWindow.document;
   let canvas = innerDoc.getElementById("canvas");
+  if (canvas == undefined) {
+    canvas = innerDoc.querySelector("body");
+  }
   iframe.width = canvas.scrollWidth;
   iframe.height = canvas.scrollHeight;
 }
@@ -46,4 +49,10 @@ function fetchCode(fileLocation, fileName) {
       }
       hljs.highlightElement(codeBlock);
     });
+}
+
+function isMobile() {
+  const regex =
+    /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  return regex.test(navigator.userAgent);
 }
