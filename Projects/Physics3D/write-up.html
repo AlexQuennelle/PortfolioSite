@@ -1,80 +1,133 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Making a Physics Simulation</title>
+    <link rel="stylesheet" href="../../style.css" />
 
-<head>
-  <meta charset="utf-8" />
-  <title>Making a Physics Simulation</title>
-  <link rel="stylesheet" href="../../style.css" />
-
-  <!-- highlight.js -->
-  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
-    media="(prefers-color-scheme: light)" />
-  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css"
-    media="(prefers-color-scheme: dark)" />
-  <!--link rel="stylesheet" href="../../highlight.css"
+    <!-- highlight.js -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <!--link rel="stylesheet" href="../../highlight.css"
     media="(prefers-color-scheme: dark)" /-->
-  <style>
-    pre.code-wrapper {
-      padding: 0;
-    }
-  </style>
-  <script src="https://unpkg.com/@highlightjs/cdn-assets@11/highlight.min.js"></script>
-  <script src="../../style.js"></script>
-  <script>
+    <style>
+      pre.code-wrapper {
+        padding: 0;
+      }
+    </style>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11/highlight.min.js"></script>
+    <script src="../../style.js"></script>
+    <script>
       //mobileOverride("../../");
-  </script>
-  <!-- Initialize highlight.js -->
-</head>
-<header>
-  <nav>
-    <a href="index.html">Back</a>
-  </nav>
-  <h1>Making a Physics Simulation</h1>
-</header>
-<main>
-  <section id="desc">
-    <h2>Background</h2>
-    <p>
-      A while ago I saw this video by SethBling about
-      <a href="https://youtu.be/DhCBCudKJTs?si=zc_XhQuwcQeqSf7i">3D rigidbody physics in Minecraft</a>
-      using the Separating Axis Theorem for collision detection, and the idea
-      really resonated with me. After seeing this video and reading up on the
-      concept, I used the knowledge to add proper 2D polygon colliders to a
-      Terraria clone I had been working on at the time in order to learn C#
-      outside the context of the Unity Game Engine. By now I've used this
-      method in several projects, including
-      <a href="../Asteroids/index.html">an implementation of Asteroids</a> for
-      college. But, all of the projects I've done using SAT so far have been
-      3D, and being the massive dweeb that I am, I've always wanted to try it
-      in 3D. What better time to try some massive new project than a month
-      before college starts back up again?
-    </p>
-    <h2>Milestone 1: Getting literally anything to work</h2>
-    <p>
-      <img src="dotprod.gif" alt="Animated gif that showcases how the dot product works"
-        style="padding: 0.25em; float: right" />
-      Before getting into how I've implemented things, I should probably
-      explain what the SAT acutally is. In all honesty it's pretty simple as
-      long as you understand a few core concepts, namely the dot product of
-      vectors. The dot product can be thought of as an operation that rotates
-      2 vectors such that one of them aligns with the x axis, and returns the
-      x component of the other vector multiplied by the first vector's length.
-      For our purposes today, we can ignore that final multiplication because
-      we can always assume at least one of our vectors is normalized, and has
-      a length of 1. The effect this has is that doing the dot product casts a
-      "shadow" of
-      <img src="Shadow.gif" alt="" style="padding: 0.25em; float: left" />
-      one vector onto the other, and gives us where that "shadow" lands on the
-      x axis. The other main concept to understand is that for any 2 convex
-      shapes that are not overlapping, there exists at least one axis onto
-      which they can be projected and their shadows don't overlap. That one is
-      pretty obvious if you think about it, but the important part is that we
-      can very easily find that axis—in fact this is pretty much the entirety
-      of the Separating Axis Theorem. It turns out that in 2D, you only need
-      to check the axes perpendicular to each side of both objects and you're
-      guaranteed to find the separating axis if it exists.
-    </p>
-  </section>
-</main>
-
+    </script>
+    <!-- Initialize highlight.js -->
+  </head>
+  <header>
+    <nav>
+      <a href="index.html">Back</a>
+    </nav>
+    <h1>Making a Physics Simulation</h1>
+  </header>
+  <main>
+    <section id="desc">
+      <h2>Background</h2>
+      <p>
+        A while ago I saw this video by SethBling about
+        <a href="https://youtu.be/DhCBCudKJTs?si=zc_XhQuwcQeqSf7i"
+          >3D rigidbody physics in Minecraft</a
+        >
+        using the Separating Axis Theorem for collision detection, and the idea
+        really resonated with me. After seeing this video and reading up on the
+        concept, I used the knowledge to add proper 2D polygon colliders to a
+        Terraria clone I had been working on at the time in order to learn C#
+        outside the context of the Unity Game Engine. By now I've used this
+        method in several projects, including
+        <a href="../Asteroids/index.html">an implementation of Asteroids</a> for
+        college. But, all of the projects I've done using SAT so far have been
+        2D, and being the massive dweeb that I am, I've always wanted to try it
+        in 3D. What better time to try some massive new project than a month
+        before college starts back up again?
+      </p>
+      <h2>Milestone 1: Getting literally anything to work</h2>
+      <p>
+        <img
+          src="dotprod.gif"
+          alt="Animated gif that showcases how the dot product works"
+          style="padding: 0.25em; float: right"
+        />
+        Before getting into how I've implemented things, I should probably
+        explain what the SAT acutally is. In all honesty it's pretty simple as
+        long as you understand a few core concepts, namely the dot product of
+        vectors. The dot product can be thought of as an operation that rotates
+        2 vectors such that one of them aligns with the x axis, and returns the
+        x component of the other vector multiplied by the first vector's length.
+        For our purposes today, we can ignore that final multiplication because
+        we can always assume at least one of our vectors is normalized, and has
+        a length of 1. The effect this has is that doing the dot product casts a
+        "shadow" of
+        <img src="Shadow.gif" alt="" style="padding: 0.25em; float: left" />
+        one vector onto the other, and gives us where that "shadow" lands on the
+        x axis. The other main concept to understand is that for any 2 convex
+        shapes that are not overlapping, there exists at least one axis onto
+        which they can be projected and their shadows don't overlap. That one is
+        pretty obvious if you think about it, but the important part is that we
+        can very easily find that axis—in fact this is pretty much the entirety
+        of the Separating Axis Theorem. It turns out that in 2D, you only need
+        to check the axes perpendicular to each side of both objects and you're
+        guaranteed to find the separating axis if it exists.
+      </p>
+      <p>
+        Now that we have our foundation, it's pretty easy to get started
+        implementing the system! One important consideration is that the SAT
+        <strong>only</strong> works for convex shapes, so any complex shapes
+        with concavities will need multiple colliders. The most simple way of
+        dealing with this is just to have each object store a
+        <code>std::vector&ltT></code> of colliders, but I think that there's
+        aesthetically a lot to be desired with that option. Instead, I opted to
+        have a base <code>Collider</code> class, and have
+        <code>MeshCollider</code> and <code>CompoundCollider</code> derive from
+        it. That way, when an object only needs a single collider, it only needs
+        to store that one collider, but more complex objects can have a compound
+        of several in the same slot. This might not be the best approach, but I
+        like it because the aformentioned aesthetics, and it gives me the
+        flexibilty to add specialized collider types down the line like a
+        sphere. I don't know if that will be worth the effort, but it's nice to
+        have the option. The main type of collider I'm going to be talking about
+        going forward is going to be the mesh collider, which has a vector of
+        vertices, and a vector of normals. Now we just need to make a function
+        that takes in 2 colliders, splits up any compound colliders, and then
+        cheks for an overlap.
+      </p>
+      <pre><code id="overlapCheckV1.txt"></code></pre>
+      <p>
+        Now, for code I wrote in a super sleep deprived state in a discord call
+        with while my equally sleep deprived friends playing games and built
+        lego, I'd say this function turned out pretty good. It has a few
+        problems I'll go over later, but for now it worked well enough that I
+        was tricked into thinking it was done based on the console log testing I
+        was doing. The function takes in a transformation matrix for each
+        collider to put them into world-space, and the loop breaks as soon as a
+        separating axis is found to avoid to avoid redundant work. This may
+        change later, as it might be necessary to complete the loop to find the
+        exact location in 3D space the collision occured. I also made the
+        function return an
+        <code>std::optional&ltT></code> of a hit object to pass info about the
+        collision back out for resolution later, and created a simple struct of
+        2 floats representing the range of values a collider covers when
+        projected onto normal. With this done, I can finally start making some
+        objects to attach these colliders to and draw to the screen!
+      </p>
+    </section>
+    <script>
+      fetchCode("", "overlapCheckV1.txt");
+    </script>
+  </main>
 </html>

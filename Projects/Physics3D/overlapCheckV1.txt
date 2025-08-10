@@ -1,0 +1,28 @@
+std::optional<HitObj> CheckCollision(const Collider* col1, const Matrix trans1,
+                                     const Collider* col2, const Matrix trans2)
+{
+    vector<Collider*> cols1 = col1->GetTransformed(trans1);
+    vector<Collider*> cols2 = col2->GetTransformed(trans2);
+    for (const auto& collider1 : cols1)
+    {
+        for (const auto& collider2 : cols2)
+        {
+            vector<Vector3> nors = collider1->GetNormals();
+            vector<Vector3> nors2 = collider2->GetNormals();
+            nors.insert(nors.end(), nors2.begin(), nors2.end());
+            for (const auto nor : nors)
+            {
+                Range proj1 = collider1->GetProjection(nor);
+                Range proj2 = collider2->GetProjection(nor);
+
+                bool overlapped =
+                    (proj1.min <= proj2.max && proj2.min <= proj1.max);
+                if (!overlapped)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    return {};
+}

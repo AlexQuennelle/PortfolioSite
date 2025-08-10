@@ -25,6 +25,9 @@ a:visited {
   font-family: "JetbrainsMono";
   src: url("Fonts/JetBrainsMonoNerdFont-Regular.ttf");
 }
+code {
+  font-size: 1rem;
+}
 p > code {
   color: #a0a0a0;
   font-family: "JetbrainsMono";
@@ -153,7 +156,7 @@ pre {
   display: inline-block;
   border: 2px solid #253041;
   border-radius: 0.5vw;
-  white-space: pree;
+  white-space: pre;
   min-width: 800px;
 }
 pre > code {
