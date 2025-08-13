@@ -97,28 +97,27 @@
         it. That way, when an object only needs a single collider, it only needs
         to store that one collider, but more complex objects can have a compound
         of several in the same slot. This might not be the best approach, but I
-        like it because the aformentioned aesthetics, and it gives me the
+        like it because of the aformentioned aesthetics, and it gives me the
         flexibilty to add specialized collider types down the line like a
         sphere. I don't know if that will be worth the effort, but it's nice to
         have the option. The main type of collider I'm going to be talking about
         going forward is going to be the mesh collider, which has a vector of
         vertices, and a vector of normals. Now we just need to make a function
         that takes in 2 colliders, splits up any compound colliders, and then
-        cheks for an overlap.
+        checks for an overlap.
       </p>
       <pre><code id="overlapCheckV1.txt"></code></pre>
       <p>
-        Now, for code I wrote in a super sleep deprived state in a discord call
-        with while my equally sleep deprived friends playing games and built
+        Now, for code I wrote in a super sleep-deprived state in a discord call
+        with while my equally sleep-deprived friends played games and built
         lego, I'd say this function turned out pretty good. It has a few
         problems I'll go over later, but for now it worked well enough that I
         was tricked into thinking it was done based on the console log testing I
         was doing. The function takes in a transformation matrix for each
         collider to put them into world-space, and the loop breaks as soon as a
-        separating axis is found to avoid to avoid redundant work. This may
-        change later, as it might be necessary to complete the loop to find the
-        exact location in 3D space the collision occured. I also made the
-        function return an
+        separating axis is found to avoid redundant work. This may change later,
+        as it might be necessary to complete the loop to find the exact location
+        in 3D space the collision occured. I also made the function return an
         <code>std::optional&ltT></code> of a hit object to pass info about the
         collision back out for resolution later, and created a simple struct of
         2 floats representing the range of values a collider covers when
