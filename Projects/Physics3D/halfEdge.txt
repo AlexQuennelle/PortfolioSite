@@ -1,0 +1,20 @@
+struct HEdge
+{
+    uint8_t vertID{0};
+    uint8_t twinID{0};
+    uint8_t nextID{0};
+    uint8_t faceID{0};
+
+    [[nodiscard]] HVertex* Vertex() const;
+    [[nodiscard]] HEdge* Twin() const;
+    [[nodiscard]] HEdge* Next() const;
+    [[nodiscard]] HFace* Face() const;
+    [[nodiscard]] Vector3 Dir() const
+    {
+        return Vector3Normalize(Vertex()->Vec() - Next()->Vertex()->Vec());
+    }
+
+    std::vector<HE::HVertex>* vertArr{nullptr};
+    std::vector<HEdge>* edgeArr{nullptr};
+    std::vector<HE::HFace>* faceArr{nullptr};
+};

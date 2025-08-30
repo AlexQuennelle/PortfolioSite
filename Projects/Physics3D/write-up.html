@@ -52,7 +52,7 @@
       </p>
     </div>
     <div id="milestone-1">
-      <h2>Milestone 1: Getting literally anything to work</h2>
+      <h2>Getting literally anything to work</h2>
       <p>
         <img src="dotprod.gif" alt="Animated gif that showcases how the dot product works"
           style="padding: 0.25em; float: right" />
@@ -120,7 +120,7 @@
       </p>
     </div>
     <div id="milestone-2">
-      <h2>Milestone 2: Visuals</h2>
+      <h2>Getting something to render</h2>
       <p>
         The first step of getting something drawing to the screen, is creating
         a class to contain all the data related to rendering and simulating a
@@ -191,15 +191,95 @@
         SAT to resolve the collisions!
       </p>
       <p>
-        These first 2 milestones, plus the background segment were all written
-        after the fact, because I hadn't decided to document the making of
-        this project in this much detail yet, but from here on each segment
-        will be written as I go through them.
+        Everything thus far was written after the fact, because I hadn't
+        decided to document the making of this project in this much detail
+        yet, but from here on each segment will be written as I go through
+        them.
+      </p>
+    </div>
+    <div id="milestone-3">
+      <h2>Course correcting</h2>
+      <p>
+        At this point I figured it would be useful to have some ability to
+        inspect and modify objects at runtime. Obviously I don't need any sort
+        of reflection system for a small personal project like this, but being
+        able to see and modify the transform data of a physics object without
+        recompiling the project would be very nice. So, I decided that before
+        moving on to collision resolution, I would implement raycasting to
+        select objects in the scene, and bring in
+        <a href="https://github.com/ocornut/imgui">Dear ImGui</a> to display
+        relevant information. I had never used ImGui before, but had heard
+        about it in passing and thought it a great fit for my purposes. After
+        some struggling with outdated documentation and git hashes, I was able
+        to get it up and running with the help of a nice compatibility library
+        called <a href="https://github.com/raylib-extras/rlImGui">rlImGui</a>.
+        Now that I had ImGui ready to use, it was time for raycasting, and
+        this is where the title of this section comes in to play. You see, up
+        to this point I had kind been going off vibes and what little
+        knowledge I already had about 3D physics in games. I had some idea of
+        how it might work, and thought I could work it out as long as I had my
+        Separating Axis Theorem implementation in place to support it all. I
+        found out just how wrong I was the moment I began to look into how
+        raycasting works—something I had no idea about whatsoever.
+      </p>
+      <p>
+        After some googling and digging through forum posts, I was able to
+        find
+        <a href="https://people.computing.clemson.edu/~dhouse/courses/405/notes/raypolygon.pdf">this</a>
+        document going over raycasting, and
+        <a href="https://media.steampowered.com/apps/valve/2015/DirkGregorius_Contacts.pdf">this</a>
+        document on 3D physics. In the second one—a document from valve—the
+        author explains very early on that they use the
+        <a href="https://en.wikipedia.org/wiki/Doubly_connected_edge_list">Half-Edge data structure</a>
+        AKA the Doubly Connected Edge List, and it became very apparent why as
+        soon as I started to read the first document. The Half-Edge data
+        structure makes it much easier to represent and iterate over
+        adjacencies like "all the edges that make up a face" or "all connected
+        faces". I had already started to move in that direction when I
+        realized previously that I needed to keep track of edges and what
+        vertices make them up, but I didn't quite think about how else I might
+        need to care about the relations between elements of the polyhedron.
+        So, I decided to read up on the data structure and implement my own
+        version. At first I made something very 'by the books' with loosely
+        connected Edge Face and Vertex objects that are related only by
+        pointers. This wasn't very convenient for my purposes, and I didn't
+        like how nothing was guaranteed to be next to anything else in memory,
+        so I instead changed the structure to exist inside a 'container' class
+        in a series of vectors. Then, each object can store a single pointer
+        for each vector it needs to access, and the index of the object it's
+        related to. As an example, the all important Edge class looks
+        something like this:
+      </p>
+      <pre><code id="halfEdge.txt"></code></pre>
+      <p>
+        I'll save you the exhaustive detail, but trying to integrate this
+        system was a massive headache that took several days of work before I
+        was even able to make sure I'd structured it all correctly. I spent
+        many hours getting segfaults and seemingly inexplicable errors that
+        ultimately boiled down to either not understanding how the
+        <code>std::map&ltT></code> structure stores it's members, or looking
+        in the complete wrong part of the code. Perhaps the funniest example
+        of the latter was towards the end of the process, when I spent nearly
+        8 hours debugging things trying to find one problem and solving about
+        a dozen others along the way, only to realize in the end that I was
+        simply providing the vertices in the wrong order so none of the half
+        edges where being paired with their opposite, since they were both
+        pointing in the same direction. After finally solving that, the
+        raycasting itself was almost child's play by comparison and only took
+        me a day or 2 of work to get fully functional.
+      </p>
+      <p>
+        From there, it was a simple matter to do a raycast from the mouse and
+        store a pointer to whatever object(if any) was hit, and display it's
+        position in an ImGui window. That info gets displayed as a series of
+        input fields, and the temporary Vector3 ImGui uses can be fed back to
+        the object at the end of the tick to change it's position at runtime!
       </p>
     </div>
   </section>
   <script>
     fetchCode("", "overlapCheckV1.txt");
+    fetchCode("", "halfEdge.txt");
   </script>
 </main>
 
