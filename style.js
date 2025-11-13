@@ -5,8 +5,13 @@ function accessiFrameContent() {
   if (canvas == undefined) {
     canvas = innerDoc.querySelector("body");
   }
-  iframe.width = canvas.scrollWidth;
-  iframe.height = canvas.scrollHeight;
+  // iframe.style.width = canvas.scrollWidth;
+  // iframe.height = canvas.scrollHeight;
+}
+function receiveMessage(event) {
+  let iframe = document.getElementById("frame");
+  iframe.width = event.data.width;
+  iframe.height = event.data.height;
 }
 
 function openFirstTab(sectionName) {
