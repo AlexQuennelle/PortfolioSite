@@ -1,0 +1,9 @@
+template <typename T> void Level::InsertAsBytes(vector<byte>& vec, T data)
+{
+	std::array<byte, sizeof(data)> buffer{};
+	std::memcpy(&buffer, &data, sizeof(data));
+	for (auto byte : buffer)
+	{
+		vec.push_back(byte);
+	}
+}

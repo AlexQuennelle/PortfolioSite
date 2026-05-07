@@ -1,0 +1,39 @@
+auto Level::Serialize() const -> vector<byte>
+{
+	vector<byte> bytes{'L', 'V', 'L', 0};
+	InsertAsBytes(bytes, this->length);
+	InsertAsBytes(bytes, this->height);
+	InsertAsBytes(bytes, static_cast<uint32_t>(this->playerStartPos.x));
+	InsertAsBytes(bytes, static_cast<uint32_t>(this->playerStartPos.y));
+
+	InsertAsBytes(bytes, static_cast<uint32_t>(this->name.length()));
+	for (auto character : this->name)
+	{
+		bytes.push_back(static_cast<byte>(character));
+	}
+	int alignment{
+		static_cast<int>((((bytes.size() / 4) + 1) * 4) - bytes.size())};
+	for (int i{0}; i < alignment; i++)
+	{
+		bytes.push_back(0);
+	}
+
+	Tile currTile{this->grid[0]};
+	uint32_t run{0};
+	for (uint64_t i{0}; i < this->grid.size(); i++)
+	{
+		if (currTile != this->grid[i])
+		{
+			InsertAsBytes(bytes, run);
+			InsertAsBytes(bytes, currTile);
+
+			currTile = this->grid[i];
+			run = 0;
+		}
+		run++;
+	}
+	InsertAsBytes(bytes, run);
+	InsertAsBytes(bytes, currTile);
+
+	return bytes;
+}
