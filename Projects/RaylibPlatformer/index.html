@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Platformer + Level Editor</title>
+    <link rel="stylesheet" href="../../style.css" />
+
+    <!-- highlight.js -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <!--link rel="stylesheet" href="../../highlight.css"
+    media="(prefers-color-scheme: dark)" /-->
+    <style>
+      pre.code-wrapper {
+        padding: 0;
+      }
+    </style>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11/highlight.min.js"></script>
+    <script src="../../style.js"></script>
+    <script>
+      mobileOverride("../../")
+      if ("addEventListener" in window) {
+        window.addEventListener("message", receiveMessage, false)
+      } else if ("attachEvent" in window) {
+        //IE
+        window.attachEvent("onmessage", receiveMessage)
+      }
+    </script>
+    <!-- Initialize highlight.js -->
+  </head>
+  <header>
+    <nav>
+      <a href="../../index.html">Home</a>
+      <!-- Link back to the main index -->
+    </nav>
+    <h1>Platformer + Level Editor</h1>
+  </header>
+  <main>
+    <section>
+      <figure>
+        <iframe
+          src="MarioMaker-Demake_0.0_web/MarioMaker-Demake.html"
+          loading="lazy"
+          scrolling="no"
+          style="border: none"
+          id="frame"
+        ></iframe>
+        <script></script>
+        <p class="disclaimer">
+          DISCLAIMER: All sprites belong to Nintendo and will be replaced with
+          original artwork in the future.
+        </p>
+        <figcaption>WASD to move, Space to jump</figcaption>
+      </figure>
+    </section>
+    <section id="desc">
+      <h2>Description</h2>
+      <p>
+        This project is inspired by Super Mario Maker 2 for the Nintendo Switch.
+        It consists of 2 modes joined by a simple (and very ugly) level select
+        screen. The gameplay mode where you play the levels was made primarily
+        by my friend and collaborator for this project
+        <a href="https://github.com/caterunions">Cate</a>, while I mainly did
+        the level editor and the UI code.
+      </p>
+    </section>
+    <section class="stretch">
+      <h2>Source Code</h2>
+      <p>
+        The source code can be found
+        <a href="https://github.com/AlexQuennelle/MarioMaker-Demake">here</a>.
+        Below are some examples from the project. More will be added at a later
+        time.
+      </p>
+      <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Level', '')">
+          Level Handling
+        </button>
+      </div>
+      <div class="tabcontent" id="Level">
+        <h3>Level Handling</h3>
+        <p>
+          Being a level editor disguised as a game, arguably the most important
+          aspect of a project inspired by Mario Maker needs is the levels.
+          Levels need to be editable, provide physics colliders during gameplay,
+          and be saved to a file. They also need to be flexible and extensible
+          so we can easily add more level elements without breaking things or
+          requiring a rework. Below are my solutions to some of these
+          requirements, starting with serialization.
+        </p>
+        <h4>Level Serialization</h4>
+        <p>
+          For serialization, I made a simple binary file format that uses
+          <a href="https://en.wikipedia.org/wiki/Run-length_encoding"
+            >run-length encoding</a
+          >
+          of tile IDs, as well as a simple header for metadata and information
+          like the name of the level.
+        </p>
+        <p>
+          This helper function was pretty useful for the serialization process
+          and converting arbitrary datatype to raw bytes.
+        </p>
+        <pre><code id="lvl_01.txt"></code></pre>
+        <p>And the actual serialization function looks like this:</p>
+        <pre><code class="language-cpp" id="lvl_02.txt"></code></pre>
+      </div>
+      <script>
+        openFirstTab("")
+        fetchCode("", "lvl_01.txt")
+        fetchCode("", "lvl_02.txt")
+        //fetchCode("", "cmakelists.txt");
+        //fetchCode("", "main.txt");
+        //fetchCode("", "model.txt");
+        //fetchCode("", "meshGeneration.txt");
+      </script>
+    </section>
+  </main>
+</html>

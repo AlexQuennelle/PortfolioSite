@@ -66,6 +66,7 @@ body {
   background-color: var(--bg0);
   color: var(--text);
   text-align: center;
+  tab-size: 4;
 }
 h1 {
   text-align: center;
@@ -153,7 +154,9 @@ span {
   text-align: center;
 }
 pre {
-  display: inline-block;
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
   border: 2px solid #253041;
   border-radius: 0.5vw;
   white-space: pre;
@@ -222,4 +225,19 @@ button.tablinks.active:after {
 .tabcontent > div > .tablinks.active:before,
 .tabcontent > div > .tablinks.active:after {
   content: none;
+}
+.tabcontent > p {
+  width: 50%;
+  min-width: 800px;
+  display: inline-block;
+  text-align: left;
+}
+.tabcontent > h4 {
+  font-size: 1.125rem;
+}
+.disclaimer {
+  text-align: center;
+  text-decoration: underline;
+  font-size: 1.125rem;
+  color: rgb(255,90,0);
 }
