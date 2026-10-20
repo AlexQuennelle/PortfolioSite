@@ -2,7 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+
+    <meta
+      property="og:description"
+      content="Hi, I'm Alex! I studied game development at Red River College Polytech.
+        I enjoy problem solving and learning new things, and pushing the
+        boundaries of what I'm capable. You can see some of the things I've made
+        here!"
+    />
+    <meta property="og:image" content="SelfieSquare.jpg" />
+
     <title>Alex Quennelle Portfolio</title>
+    <link rel="icon" href="code.svg" media="(prefers-color-scheme: dark)" />
     <link rel="stylesheet" href="style.css" />
     <script src="style.js"></script>
     <script>
@@ -20,40 +31,45 @@
   <body>
     <header>
       <h1>Alex Quennelle</h1>
-      <p>Game Developer | Programmer | RRC Polytech student</p>
+      <p>Game Developer | Programmer | RRC Polytech graduate</p>
     </header>
     <noscript>
       <p>
-        Please enable Javascript to access the full functionality of this
+        Please enable JavaScript to access the full functionality of this
         website.
       </p>
     </noscript>
     <section id="aboutme">
       <h2>About Me</h2>
-      <p>
-        Hi, I'm Alex! I studied game development at Red River
-        College Polytech. I enjoy problem solving and learning new things, and
-        pushing the boundaries of what I'm capable. You can see some of the
-        things I've made below!
+      <img
+      src="SelfieSquare.jpg"
+      alt="A picture of me"
+      style="width: 17.5em; float: right; margin-bottom: 5em;"
+      />
+      <p style="margin-top: 5em;">
+        Hi, I'm Alex! I studied game development at Red River College Polytech.
+        I enjoy problem solving and learning new things, and pushing the
+        boundaries of what I'm capable. You can see some of the things I've made
+        below!
       </p>
       <h3>Education</h3>
       <ul>
         <li><strong>Game Development: Programming</strong> — RRC Polytech</li>
-        <li><strong>Highschool</strong> — College Lorette Collegiate</li>
+        <li><strong>High school</strong> — College Lorette Collegiate</li>
       </ul>
       <h3>Skills</h3>
       <ul>
         <li><strong>Game Engines: </strong>Unity3D, Unreal Engine 5</li>
         <li>
           <strong>Frameworks/Libraries: </strong>Raylib(C++), MonoGame(C#),
-          p5js(JavaScript), SFML(C++), QtFramework(C++)
+          p5js(JavaScript), SFML(C++), Qt Framework(C++)
         </li>
         <li>
           <strong>Tools: </strong>
           <ul>
             <li><strong>Git</strong></li>
             <li>
-              <strong>Blender3D</strong>(Basic modeling, Basic compositing,
+              <strong>Blender 3D</strong>(Basic modelling, Basic compositing,
               Basic animation, Basic skeletal rig automation, Node based
               materials)
             </li>
@@ -63,7 +79,6 @@
             <li><strong>CMake</strong></li>
             <li><strong>Emscripten</strong></li>
             <li><strong>Perforce</strong></li>
-            <li><strong>GNU coreutils</strong></li>
           </ul>
         </li>
         <li>
@@ -74,7 +89,7 @@
       <hr />
     </section>
     <h2>Projects</h2>
-    <section class="grid">
+    <section class="grid" id="projects">
       <article>
         <a href="Projects/VoxelLoader/index.html">
           <figure>
@@ -135,6 +150,18 @@
               loading="lazy"
             />
             <figcaption>Platformer + level editor</figcaption>
+          </figure>
+        </a>
+      </article>
+      <article>
+        <a href="Projects/DesktopShell/index.html">
+          <figure>
+            <img
+              src="Projects/DesktopShell/ShellThumb.png"
+              alt="Pixel art depicting desktop shell components, including a top toolbar and a launcher"
+              loading="lazy"
+            />
+            <figcaption>Qt6 Desktop Shell for Linux</figcaption>
           </figure>
         </a>
       </article>

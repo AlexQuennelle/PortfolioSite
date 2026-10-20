@@ -100,7 +100,7 @@ strong {
   grid-template-columns: repeat(auto-fill, var(--gridSize)) !important;
   gap: 1em;
   text-align: center;
-  --gridSize: calc(19em + 4px);
+  --gridSize: calc(20em + 4px);
 }
 .grid > article {
   box-sizing: border-box;

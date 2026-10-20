@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="">
+  <head>
+    <meta charset="utf-8" />
+    <title>Qt6 Desktop Shell</title>
+    <link
+      rel="icon"
+      href="../../code.svg"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="stylesheet" href="../../style.css" />
+    <!-- highlight.js -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github.min.css"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@highlightjs/cdn-assets@11/styles/github-dark.min.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <!--link rel="stylesheet" href="../../highlight.css"
+    media="(prefers-color-scheme: dark)" /-->
+    <style>
+      pre.code-wrapper {
+        padding: 0;
+      }
+    </style>
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11/highlight.min.js"></script>
+    <script src="../../style.js"></script>
+    <script>
+      mobileOverride("../../")
+      if ("addEventListener" in window) {
+        window.addEventListener("message", receiveMessage, false)
+      } else if ("attachEvent" in window) {
+        //IE
+        window.attachEvent("onmessage", receiveMessage)
+      }
+    </script>
+    <!-- Initialize highlight.js -->
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="../../index.html#projects">Home</a>
+        <!-- Link back to the main index -->
+      </nav>
+      <h1>Qt6 Desktop Shell</h1>
+    </header>
+    <main>
+      <section id="desc">
+        <h2>Description</h2>
+        <p>
+          This project was a result of frustration with projects like
+          <a href="https://quickshell.org">Quickshell</a> and shells built on
+          it. The reliance on pure
+          <a href="https://en.wikipedia.org/wiki/QML">qml</a> for building the
+          entire shell application leads to a lot of tedium and poor practices
+          such as tight coupling, and as impressive as Quickshell is as a
+          framework, it feels quite limiting for someone more used to raw C++.
+          Seeing as this is the case, I took the opportunity to step back down
+          the tech stack and interact directly with Qt6 myself. This let me
+          limit the amount of qml I had to write, and design the application
+          architecture myself.
+        </p>
+        <p>
+          The ultimate goal is to have a fully functional suite of custom
+          desktop shell components(fully featured top bar, launcher/power menu).
+          As of now, I have a top bar that displays the time and currently
+          focused window, as well as interactable indicators for
+          <a href="https://github.com/niri-wm/niri">niri</a> workspaces.
+        </p>
+        <p>
+          Eventually, I'd also like to make the project compatible with all
+          Wayland compositors that support the
+          <a href="https://wayland.app/protocols/ext-workspace-v1"
+            >ext-workspace-v1</a
+          >
+          protocol extension, but for now it uses a backend module specialized
+          for niri, as that's what I use on my desktop. The reason the generic
+          Wayland backend was put on the back burner is because I ran into some
+          strange quirks in how Qt's Wayland protocol extension is implemented,
+          and I found interacting directly with niri over its IPC socket to be
+          much simpler.
+        </p>
+      </section>
+      <section class="stretch">
+        <h2>Source Code</h2>
+        <p>
+          The source code can be found
+          <a href="https://github.com/AlexQuennelle/customShell">here</a>. Code
+          examples will be added at a later date.
+        </p>
+        <div class="tab">
+          <button class="tablinks" onclick="openTab(event, 'niri', '')">
+            niri Module
+          </button>
+        </div>
+        <div class="tabcontent" id="niri">
+          <h3>niri Module</h3>
+          <p>
+            When designing the broad architecture of this project, I decided on
+            a modular approach that would let me create multiple backend
+            implementations. The reason I did this despite only planning on
+            using it on the one Wayland compositor that I use day to day, is
+            twofold. First, explicitly separating the backend that interacts wit
+            the compositor from the rest of the application via an interface
+            makes it harder to become lazy and tightly couple things that ought
+            to be independent in the pursuit of fast results, and second, I
+            really want to properly explore Wayland protocols because I find the
+            design philosophy fascinating. As a tertiary reason, it might also
+            be cool to add more specialized backends at a later time for the
+            sake of learning.
+          </p>
+          <p>
+            Communicating with the niri IPC was quite simple, if a bit tedious.
+            niri sends events to the Unix socket located at
+            <code>$NIRI_SOCKET</code>, and will provide events to any process
+            that requests it by sending the string <code>EventStream</code> over
+            that same socket. Thanks to the extensive documentation provided
+            <a href="https://niri-wm.github.io/niri/niri_ipc/index.html">here</a
+            >, it was a fairly simple job to translate the relevant Rust types
+            to C++ types, and feed those to
+            <a href="https://github.com/stephenberry/glaze">glaze</a> to handle
+            serialization. The only real hiccups I ran into with this process
+            were that some of the niri types have variable names due to rust
+            enums, and that clangd doesn't yet understand P2996 reflection in
+            C++26. I was using reflection to simplify some of the serialization
+            logic for C++ enum values, and clangd kept throwing a fit about the
+            missing function definitions and the new operators.
+          </p>
+          <p>
+            Because I also separated the workspace manager module from the
+            compositor backend module, the niri backend is paired with a thin
+            wrapper class that simply forwards calls to the interface API
+            directly to the specialized compositor backend.
+          </p>
+          <p>
+            Unfortunately, because of how data and event driven this section of
+            the project is, there isn't actually much in terms of concise or
+            interesting code examples I can show in this section, but I am quite
+            happy with how it has turned out on a macro scale.
+          </p>
+        </div>
+        <script>
+          openFirstTab("")
+        </script>
+      </section>
+    </main>
+  </body>
+</html>
