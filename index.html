@@ -12,17 +12,11 @@
     <title>Alex Quennelle Portfolio</title>
     <link rel="icon" href="code.svg" />
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="carousel.css" />
     <script src="style.js"></script>
     <script>
       mobileOverride("")
     </script>
-    <!--style>
-      main > section.grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1rem;
-      }
-    </style-->
   </head>
 
   <body>
@@ -36,6 +30,32 @@
         website.
       </p>
     </noscript>
+
+    <div style="display: flex; justify-content: center">
+      <div id="carousel">
+        <div id="scroller">
+          <a href="" class="carouselCard carouselDecoy">
+            <img src="" alt="" />
+            <p id="title">title</p>
+            <p id="description">description</p>
+          </a>
+          <a href="" class="carouselCard" id="centerCard">
+            <img src="" alt="" />
+            <p id="title">title</p>
+            <p id="description">description</p>
+          </a>
+          <a href="" class="carouselCard carouselDecoy">
+            <img src="" alt="" />
+            <p id="title">title</p>
+            <p id="description">description</p>
+          </a>
+        </div>
+        <button type="" style="left: 0%" onclick="Scroll(true)"><</button>
+        <button type="" style="right: 0%" onclick="Scroll(false)">></button>
+      </div>
+    </div>
+    <script src="carousel.js"></script>
+
     <section id="aboutme">
       <h2>About Me</h2>
       <img

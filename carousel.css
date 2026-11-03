@@ -1,0 +1,90 @@
+:root {
+  --card-width: 16rem;
+  --card-height: 16rem;
+  --card-margin: calc(var(--card-width) / 8);
+  --card-bg: #181818;
+  --card-bg-h: #282828;
+  --card-border: 2px;
+  --card-border-radius: 8px;
+  --card-border-col: #555;
+  --card-border-col-h: #fff;
+}
+#scroller {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: calc(3 * (var(--card-width) + (2 * var(--card-margin))));
+  left: calc(0em - (var(--card-width) + var(--card-margin)));
+}
+#carousel {
+  height: var(--card-height);
+  width: calc(var(--card-width) * 1.5);
+  overflow: clip;
+  position: relative;
+}
+#carousel > button {
+  position: absolute;
+  top: calc(50% - 4em);
+  height: 6em;
+  width: 3em;
+  margin: 1em;
+}
+.carouselCard:hover {
+  border: var(--card-border) solid var(--card-border-col-h);
+  background: var(--card-bg-h);
+  color: inherit;
+  text-decoration: none;
+}
+.carouselCard:visited {
+  color: inherit;
+  text-decoration: none;
+}
+.carouselCard {
+  margin: 0 var(--card-margin) 0 var(--card-margin);
+  position: relative;
+  box-sizing: border-box;
+  display: inline-block;
+  border: var(--card-border) solid var(--card-border-col);
+  border-radius: var(--card-border-radius);
+  height: var(--card-height);
+  width: var(--card-width);
+  padding: 1em;
+  background: var(--card-bg);
+}
+.carouselCard > img {
+  object-fit: contain;
+  height: 60%;
+  width: 100%;
+}
+.carouselCard > #title {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+.carouselCard > #description {
+  margin: 0;
+  width: 100%;
+  font-size: 0.85rem;
+}
+.carouselCard:hover > #description.long::before {
+  background:linear-gradient(transparent 50%, var(--card-bg-h) 90%);
+  border-bottom: var(--card-border) solid var(--card-border-col-h);
+  border-left: var(--card-border) solid var(--card-border-col-h);
+  border-right: var(--card-border) solid var(--card-border-col-h);
+}
+.carouselCard > #description.long::before {
+  pointer-events: none;
+  content: '';
+  width: var(--card-width);
+  height: 4rem;    
+  position: absolute;
+  left: calc(0px - var(--card-border));
+  bottom: calc(0px - var(--card-border));
+  background: linear-gradient(transparent 50%, var(--card-bg) 90%);
+  box-sizing: border-box;
+  border-radius: 0px 0px var(--card-border-radius) var(--card-border-radius);
+  border-bottom: var(--card-border) solid var(--card-border-col);
+  border-left: var(--card-border) solid var(--card-border-col);
+  border-right: var(--card-border) solid var(--card-border-col);
+}
