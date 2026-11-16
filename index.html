@@ -16,13 +16,6 @@
     <script>
       mobileOverride("")
     </script>
-    <!--style>
-      main > section.grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1rem;
-      }
-    </style-->
   </head>
 
   <body>
@@ -59,7 +52,7 @@
         <li><strong>Game Engines: </strong>Unity3D, Unreal Engine 5</li>
         <li>
           <strong>Frameworks/Libraries: </strong>Raylib(C++), MonoGame(C#),
-          p5js(JavaScript), SFML(C++), Qt Framework(C++)
+          p5js(JavaScript), SFML(C++), Qt6 Framework(C++)
         </li>
         <li>
           <strong>Tools: </strong>
@@ -76,6 +69,7 @@
             <li><strong>CMake</strong></li>
             <li><strong>Emscripten</strong></li>
             <li><strong>Perforce</strong></li>
+            <li><strong>GNU Coreutils</strong></li>
           </ul>
         </li>
         <li>
@@ -90,11 +84,13 @@
       <article>
         <a href="Projects/VoxelLoader/index.html">
           <figure>
-            <img
-              src="Projects/VoxelLoader/screenshot.png"
-              alt="Render of a voxelized version of the stanford dragon model"
-              loading="lazy"
-            />
+            <div>
+              <img
+                src="Projects/VoxelLoader/screenshot.png"
+                alt="Render of a voxelized version of the stanford dragon model"
+                loading="lazy"
+              />
+            </div>
             <figcaption>.vox file previewer</figcaption>
           </figure>
         </a>
@@ -102,11 +98,19 @@
       <article>
         <a href="https://cate-runions.itch.io/damnations-descent">
           <figure>
-            <img
-              src="Projects/DamnationsDescent.png"
-              alt="Damnation's Descent Logo"
-              loading="lazy"
-            />
+            <div>
+              <img
+                src="Projects/DamnationsDescent.png"
+                alt="Damnation's Descent Logo"
+                loading="lazy"
+              />
+              <img
+                class="blurred"
+                src="Projects/DamnationsDescent.png"
+                alt="Damnation's Descent Logo"
+                loading="lazy"
+              />
+            </div>
             <figcaption>Damnation's Descent</figcaption>
           </figure>
         </a>
@@ -114,12 +118,19 @@
       <article>
         <a href="Projects/Asteroids/index.html">
           <figure>
-            <!-- TODO: Fix image and alt text -->
-            <img
-              src="Projects/Asteroids/screenshot.png"
-              alt="TEMP"
-              loading="lazy"
-            />
+            <div>
+              <img
+                src="Projects/Asteroids/screenshot.png"
+                alt=""
+                loading="lazy"
+              />
+              <img
+                class="blurred"
+                src="Projects/Asteroids/screenshot.png"
+                alt=""
+                loading="lazy"
+              />
+            </div>
             <figcaption>Asteroids Game</figcaption>
           </figure>
         </a>
@@ -127,12 +138,13 @@
       <article>
         <a href="Projects/Physics3D/index.html">
           <figure>
-            <!-- TODO: Fix image and alt text -->
-            <img
-              src="Projects/Physics3D/thumbnail.png"
-              alt="TEMP"
-              loading="lazy"
-            />
+            <div>
+              <img
+                src="Projects/Physics3D/thumbnail.png"
+                alt=""
+                loading="lazy"
+              />
+            </div>
             <figcaption>Physics Simulation</figcaption>
           </figure>
         </a>
@@ -140,12 +152,13 @@
       <article>
         <a href="Projects/RaylibPlatformer/index.html">
           <figure>
-            <!-- TODO: Fix image and alt text -->
-            <img
-              src="Projects/RaylibPlatformer/thumbnail.png"
-              alt="TEMP"
-              loading="lazy"
-            />
+            <div>
+              <img
+                src="Projects/RaylibPlatformer/thumbnail.png"
+                alt=""
+                loading="lazy"
+              />
+            </div>
             <figcaption>Platformer + level editor</figcaption>
           </figure>
         </a>
@@ -153,11 +166,13 @@
       <article>
         <a href="Projects/DesktopShell/index.html">
           <figure>
-            <img
-              src="Projects/DesktopShell/ShellThumb.png"
-              alt="Pixel art depicting desktop shell components, including a top toolbar and a launcher"
-              loading="lazy"
-            />
+            <div>
+              <img
+                src="Projects/DesktopShell/ShellThumb.png"
+                alt="Pixel art depicting desktop shell components, including a top toolbar and a launcher"
+                loading="lazy"
+              />
+            </div>
             <figcaption>Qt6 Desktop Shell for Linux</figcaption>
           </figure>
         </a>
